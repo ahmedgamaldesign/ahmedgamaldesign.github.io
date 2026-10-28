@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+# Pages carry a noindex meta tag; blocking them here would hide that tag from search engines.
