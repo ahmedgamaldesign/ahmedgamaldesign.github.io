@@ -80,6 +80,19 @@ audio { height: 36px; max-width: 100%; }
 .box img { max-width: 100%; max-height: calc(100vh - 140px); object-fit: contain; display: block; }
 .box .x { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 10px); right: 14px; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.4); background: transparent; color: #fff; font-size: 22px; cursor: pointer; }
 .foot { text-align: center; color: var(--muted); font-size: 13px; margin-top: 30px; }
+.tabs { position: sticky; top: 0; z-index: 15; background: rgba(243,247,250,.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); padding: 0 20px; }
+.tabs .in { max-width: 1180px; margin: 0 auto; display: flex; gap: 6px; }
+.tab { font: 600 15px var(--f-body); color: var(--muted); background: none; border: 0; border-bottom: 3px solid transparent; padding: 15px 14px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--cyan); }
+.tab .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.tab:disabled { cursor: default; }
+.note-ro { margin-top: 10px; font-size: 14px; color: var(--muted); }
+.note-ro b { color: var(--ink); font-weight: 600; }
+.files { display: grid; gap: 10px; align-content: start; }
+.files .btn { justify-content: space-between; min-width: 260px; }
+.files .btn small { font-weight: 400; opacity: .75; }
+.all { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; }
+.all p { margin: 0; color: var(--muted); max-width: 60ch; }
 </style>
 </head>
 <body>
@@ -89,14 +102,18 @@ audio { height: 36px; max-width: 100%; }
   <h1 id="title">Your designs</h1>
   <p class="lead" id="lead">Loading…</p>
 </div></header>
-<main><div class="in" id="app"></div></main>
+<nav class="tabs" id="tabs" hidden><div class="in" role="tablist">
+  <button class="tab" role="tab" id="t-sel" aria-controls="p-sel" aria-selected="true" type="button">Preview &amp; selection</button>
+  <button class="tab" role="tab" id="t-fin" aria-controls="p-fin" aria-selected="false" type="button">Final files</button>
+</div></nav>
+<main><div class="in" id="app"><div id="p-sel" role="tabpanel" aria-labelledby="t-sel"></div><div id="p-fin" role="tabpanel" aria-labelledby="t-fin" hidden></div></div></main>
 <div class="bar" id="bar" hidden><div class="in"><div><div class="count" id="count"></div><p class="msg" id="msg" role="status" aria-live="polite"></p></div>
   <button class="btn primary" id="send" type="button" disabled>Send</button></div></div>
 <div class="box" id="box" role="dialog" aria-modal="true" aria-label="Design at full size"><button class="x" type="button" aria-label="Close">×</button><img alt=""><div class="cap"><span class="cap-t"></span><button class="btn primary small cap-pick" type="button" hidden>Choose this design</button></div></div>
 <script>
 (function () {
   var API = 'https://script.google.com/macros/s/AKfycbwH4J-rHUD-tbI3oI5hzAtJczLuyDyYq5icd_cOvEiPV7RhNQRy8JYZNEOkxP84b6Cf/exec';
-  var T = (location.hash || '').replace(/^#\/?/, '').trim();
+  var T = (location.hash || '').replace(/^#\/?/, '').replace(/\/final$/, '').trim();
   var app = document.getElementById('app'), bar = document.getElementById('bar'), sendBtn = document.getElementById('send');
   var countEl = document.getElementById('count'), msgEl = document.getElementById('msg');
   var DESC = { 'continue': 'Your brand’s own social look, refined.', proven: 'What works best in your field.', fresh: 'A new look from a neighbouring field.' };
@@ -189,10 +206,26 @@ audio { height: 36px; max-width: 100%; }
     return chain;
   }
 
-  // ---------- the three states ----------
+  // ---------- the two tabs ----------
+  var pSel = document.getElementById('p-sel'), pFin = document.getElementById('p-fin');
+  var tSel = document.getElementById('t-sel'), tFin = document.getElementById('t-fin');
+  var interactive = false;
+  function show(which) {
+    var fin = which === 'fin';
+    tSel.setAttribute('aria-selected', fin ? 'false' : 'true'); tFin.setAttribute('aria-selected', fin ? 'true' : 'false');
+    pSel.hidden = fin; pFin.hidden = !fin;
+    bar.hidden = fin || !interactive;
+    try { history.replaceState(null, '', '#' + T + (fin ? '/final' : '')); } catch (e) {}
+    window.scrollTo(0, 0);
+  }
+  tSel.addEventListener('click', function () { show('sel'); });
+  tFin.addEventListener('click', function () { show('fin'); });
+  function lead(t) { document.getElementById('lead').textContent = t; }
+
+  // ---------- tab 1: choose (open round) ----------
   function renderChoose() {
-    var saved = store.get();
-    document.getElementById('lead').textContent = 'Each post comes in three directions. Choose one for every post; tap a design to see it full size. If you want something changed, add a note or record a voice note under that post (one revision per design is included).';
+    var saved = store.get(); interactive = true;
+    lead('Each post comes in three directions. Choose one for every post; tap a design to see it full size. If you want something changed, add a note or record a voice note under that post (one revision per design is included).');
     job.posts.forEach(function (p) {
       var s = el('section', { 'class': 'post', id: 'post-' + p.n });
       s.appendChild(el('h2', null, '<span class="num">POST ' + p.n + '</span>' + esc(p.name)));
@@ -218,10 +251,9 @@ audio { height: 36px; max-width: 100%; }
       ta.value = saved['c-' + p.n] || p.comment || '';
       ta.addEventListener('input', function () { var sv = store.get(); sv['c-' + p.n] = ta.value; store.set(sv); });
       n.appendChild(ta); n.appendChild(voiceUI(String(p.n))); s.appendChild(n);
-      app.appendChild(s);
+      pSel.appendChild(s);
     });
     sendBtn.textContent = 'Send my choices';
-    bar.hidden = false;
     function update() {
       var done = job.posts.filter(function (p) { return document.querySelector('input[name="pick-' + p.n + '"]:checked'); }).length;
       countEl.innerHTML = 'Chosen <b>' + done + ' of ' + job.posts.length + '</b>';
@@ -232,14 +264,15 @@ audio { height: 36px; max-width: 100%; }
       var picks = job.posts.map(function (p) { var c = document.querySelector('input[name="pick-' + p.n + '"]:checked'); return { n: p.n, pick: c && c.value, comment: document.getElementById('c-' + p.n).value }; });
       sendBtn.disabled = true;
       sendVoices(1).then(function () { say('Sending your choices…'); return post({ action: 'choose', t: T, picks: picks }); })
-        .then(function () { store.set({}); thanks('Thank you. Your choices are with me.', 'I’ll prepare the final designs and the revisions you asked for, and send you this same link when they’re ready.'); })
+        .then(function () { store.set({}); reload('Thank you. Your choices are with me.', 'I’ll prepare the final designs and the revisions you asked for, and send you this same link when they’re ready.'); })
         .catch(function (e) { sendBtn.disabled = false; say((e && e.message ? e.message + ' ' : '') + 'If it keeps failing, write to me on WhatsApp or at ahmedgamal8438@gmail.com.', true); });
     };
   }
 
+  // ---------- tab 1: revise (open round) ----------
   function renderRevise() {
-    var saved = store.get();
-    document.getElementById('lead').textContent = 'Here are your designs after the revisions. Approve each one, or ask for a change with a note or a voice note.';
+    var saved = store.get(); interactive = true;
+    lead('Here are your designs after the revisions. Approve each one, or ask for a change with a note or a voice note.');
     job.posts.forEach(function (p) {
       var s = el('section', { 'class': 'post' });
       s.appendChild(el('h2', null, '<span class="num">POST ' + p.n + '</span>' + esc(p.name) + (p.revised ? ' <span class="tag">Revised</span>' : '')));
@@ -254,11 +287,10 @@ audio { height: 36px; max-width: 100%; }
       var ta = el('textarea', { id: 'c2-' + p.n, placeholder: 'What should change?' }); ta.value = saved['c2-' + p.n] || p.comment2 || '';
       ta.addEventListener('input', function () { var sv = store.get(); sv['c2-' + p.n] = ta.value; store.set(sv); });
       n.append(el('label', { 'for': 'c2-' + p.n }, 'A note (optional)'), ta, voiceUI(String(p.n)));
-      r.appendChild(n); one.appendChild(r); s.appendChild(one); app.appendChild(s);
+      r.appendChild(n); one.appendChild(r); s.appendChild(one); pSel.appendChild(s);
       ch.querySelectorAll('input').forEach(function (i) { i.addEventListener('change', function () { var sv = store.get(); sv['ok-' + p.n] = i.value; store.set(sv); update(); }); });
     });
     sendBtn.textContent = 'Send';
-    bar.hidden = false;
     function update() {
       var done = job.posts.filter(function (p) { return document.querySelector('input[name="ok-' + p.n + '"]:checked'); }).length;
       countEl.innerHTML = 'Answered <b>' + done + ' of ' + job.posts.length + '</b>';
@@ -269,50 +301,93 @@ audio { height: 36px; max-width: 100%; }
       var items = job.posts.map(function (p) { var c = document.querySelector('input[name="ok-' + p.n + '"]:checked'); return { n: p.n, ok: c ? c.value === '1' : null, comment: document.getElementById('c2-' + p.n).value }; });
       sendBtn.disabled = true;
       sendVoices(2).then(function () { say('Sending…'); return post({ action: 'approve', t: T, items: items }); })
-        .then(function () { store.set({}); thanks('Thank you. Your answers are with me.', 'Approved designs go into the final files; anything you asked to change comes back to you on this same link.'); })
+        .then(function () { store.set({}); reload('Thank you. Your answers are with me.', 'Approved designs go into the final files; anything you asked to change comes back to you on this same link.'); })
         .catch(function (e) { sendBtn.disabled = false; say((e && e.message ? e.message + ' ' : '') + 'If it keeps failing, write to me on WhatsApp or at ahmedgamal8438@gmail.com.', true); });
     };
   }
 
+  // ---------- tab 1: the record (a round sent, or the job final) ----------
+  function renderRecord(msgH, msgP) {
+    interactive = false;
+    if (msgH) { var x = el('section', { 'class': 'panel', style: 'margin-bottom:22px' }); x.appendChild(el('h2', null, esc(msgH))); if (msgP) x.appendChild(el('p', { 'class': 'muted' }, esc(msgP))); pSel.appendChild(x); }
+    job.posts.forEach(function (p) {
+      var s = el('section', { 'class': 'post' });
+      var tag = job.state === 'final' ? ' <span class="tag">Approved</span>' : (p.revised ? ' <span class="tag">Revised</span>' : '');
+      s.appendChild(el('h2', null, '<span class="num">POST ' + p.n + '</span>' + esc(p.name) + tag));
+      var one = el('div', { 'class': 'one' });
+      one.appendChild(frame(p.file, p.ratio, 'Post ' + p.n + (p.label ? ' · ' + p.label : '')));
+      var r = el('div');
+      if (p.label) r.appendChild(el('div', { 'class': 'note-ro' }, 'Your choice: <b>' + esc(p.label) + '</b> <span class="muted">· ' + esc(DESC[p.pick] || '') + '</span>'));
+      if (p.comment) r.appendChild(el('div', { 'class': 'note-ro' }, 'Your note: ' + esc(p.comment)));
+      if (p.ok === false) r.appendChild(el('div', { 'class': 'note-ro' }, 'You asked for a change' + (p.comment2 ? ': ' + esc(p.comment2) : '.')));
+      if (p.ok === true && job.state !== 'final') r.appendChild(el('div', { 'class': 'note-ro' }, 'You approved it.'));
+      // the other two directions, small, for the record
+      var others = (p.options || []).filter(function (o) { return o.key !== p.pick; });
+      if (others.length && job.state !== 'final') {
+        var g = el('div', { 'class': 'opts', style: 'grid-template-columns:repeat(2,minmax(0,1fr));max-width:420px;margin-top:14px' });
+        others.forEach(function (o) { var c = el('div', { 'class': 'opt' }); c.appendChild(frame(o.file, p.ratio, 'Post ' + p.n + ' · ' + o.label)); c.appendChild(el('div', { 'class': 'olab' }, '<div><b>' + esc(o.label) + '</b></div>')); g.appendChild(c); });
+        r.appendChild(el('div', { 'class': 'note-ro' }, 'The other directions:')); r.appendChild(g);
+      }
+      one.appendChild(r); s.appendChild(one); pSel.appendChild(s);
+    });
+  }
+
+  // ---------- tab 2: the final files ----------
   function renderFinal() {
-    document.getElementById('lead').textContent = 'Your final designs: a high-quality file for each post, ready to publish, and a simple layered PSD so you can edit the text or swap the logo yourself.';
-    if (job.files_folder) {
-      var w = el('section', { 'class': 'post' });
-      w.appendChild(el('h2', null, 'All your files, in one folder'));
-      w.appendChild(el('p', { 'class': 'muted' }, 'For every post: the high-quality file (PNG) and the layered PSD, with the list of fonts the PSDs use. In Google Drive you can download a single file, or the whole folder at once (Download, top right).'));
-      var z = el('div', { 'class': 'dl' }); z.appendChild(el('a', { 'class': 'btn primary', href: job.files_folder, target: '_blank', rel: 'noopener' }, 'Open your files (Google Drive)'));
-      w.appendChild(z); app.appendChild(w);
-    } else if (job.zip) { var z2 = el('div', { 'class': 'dl' }); z2.appendChild(el('a', { 'class': 'btn primary', href: job.zip, rel: 'noopener' }, 'Download all designs (ZIP)')); var w2 = el('section', { 'class': 'post' }); w2.appendChild(z2); app.appendChild(w2); }
+    if (job.state !== 'final') {
+      var x = el('section', { 'class': 'panel' });
+      x.appendChild(el('h2', null, 'Your final files will be here'));
+      x.appendChild(el('p', { 'class': 'muted' }, 'Once your designs are approved, this tab gives you each post as a high-quality file, ready to publish, and as a layered PSD you can edit.'));
+      pFin.appendChild(x); return;
+    }
+    if (job.files_folder || job.zip) {
+      var w = el('section', { 'class': 'post' }), all = el('div', { 'class': 'all' });
+      all.appendChild(el('a', { 'class': 'btn primary', href: job.files_folder || job.zip, target: '_blank', rel: 'noopener' }, 'Download all' + (job.files_folder ? ' (Google Drive folder)' : ' (ZIP)')));
+      all.appendChild(el('p', null, job.files_folder ? 'Every file in one folder. In Google Drive, press Download (top right) to get the whole folder at once.' : 'All the high-quality files in one ZIP.'));
+      w.appendChild(all); pFin.appendChild(w);
+    }
     job.posts.forEach(function (p) {
       var s = el('section', { 'class': 'post' });
       s.appendChild(el('h2', null, '<span class="num">POST ' + p.n + '</span>' + esc(p.name)));
       var one = el('div', { 'class': 'one' }); one.appendChild(frame(p.file, p.ratio, 'Post ' + p.n));
-      var d = el('div', { 'class': 'dl' });
-      if (p.png) d.appendChild(el('a', { 'class': 'btn primary', href: p.png, rel: 'noopener' }, 'High-quality file'));
-      if (p.psd) d.appendChild(el('a', { 'class': 'btn', href: p.psd, rel: 'noopener' }, 'Layered PSD'));
-      if (!p.png && !p.psd) d.appendChild(el('span', { 'class': 'muted' }, job.files_folder ? 'Its PNG and PSD are in your folder (above).' : 'The files for this post are on their way.'));
-      one.appendChild(d); s.appendChild(one); app.appendChild(s);
+      var d = el('div', { 'class': 'files' });
+      if (p.hq) d.appendChild(el('a', { 'class': 'btn primary', href: p.hq, rel: 'noopener' }, '<span>High-quality ' + esc(p.hq_kind || 'file') + '</span><small>' + esc(p.hq_size || 'ready to publish') + '</small>'));
+      if (p.psd) d.appendChild(el('a', { 'class': 'btn', href: p.psd, rel: 'noopener' }, '<span>Layered PSD</span><small>' + esc(p.psd_size || 'editable') + '</small>'));
+      if (!p.hq && !p.psd) d.appendChild(el('span', { 'class': 'muted' }, job.files_folder ? 'Its files are in the folder (Download all).' : 'The files for this post are on their way.'));
+      d.appendChild(el('p', { 'class': 'muted', style: 'margin:6px 0 0;font-size:13px' }, 'High-quality: twice the platform size, sharp on every screen. PSD: the text, the logo and the shapes stay editable (the fonts it uses need to be installed).'));
+      one.appendChild(d); s.appendChild(one); pFin.appendChild(s);
     });
   }
 
-  function thanks(h, p) {
-    bar.hidden = true; app.innerHTML = '';
-    var x = el('section', { 'class': 'panel' }); x.appendChild(el('h2', null, esc(h))); x.appendChild(el('p', { 'class': 'muted' }, esc(p)));
-    app.appendChild(x); window.scrollTo(0, 0);
+  function reload(h, p) { pSel.innerHTML = ''; pFin.innerHTML = ''; bar.hidden = true; load(h, p); }
+  function problem(t) { lead(''); var x = el('section', { 'class': 'panel' }); x.appendChild(el('h2', null, 'This page can’t open')); x.appendChild(el('p', { 'class': 'muted' }, esc(t))); app.appendChild(x); }
+
+  function load(msgH, msgP) {
+    return get('a=job&t=' + encodeURIComponent(T)).then(function (j) {
+      if (!j.ok) { problem(j.error || 'This link is not valid.'); return; }
+      job = j.job;
+      document.getElementById('title').textContent = (job.brand || job.client || 'Your designs') + (job.title ? ' · ' + job.title : '');
+      document.title = (job.brand || 'Your designs') + ' · Gulf Social Studio';
+      document.getElementById('tabs').hidden = false;
+      var rs = job.round_sent || {};
+      interactive = false;
+      if (job.state === 'choose' && !rs.choose) renderChoose();
+      else if (job.state === 'revise' && !rs.revise) renderRevise();
+      else {
+        if (!msgH && job.state === 'choose') { msgH = 'Your choices are with me.'; msgP = 'Sent on ' + rs.choose + ' (Cairo time). I’ll send you this same link when the designs are ready.'; }
+        if (!msgH && job.state === 'revise') { msgH = 'Your answers are with me.'; msgP = 'Sent on ' + rs.revise + ' (Cairo time). The final files come on this same link.'; }
+        lead(job.state === 'final' ? 'Your designs are approved. The Final files tab has each one as a high-quality file and a layered PSD.' : 'Your choices for each post, for the record.');
+        renderRecord(msgH, msgP);
+      }
+      renderFinal();
+      tFin.innerHTML = 'Final files' + (job.state === 'final' ? ' <span class="dot" aria-hidden="true"></span>' : '');
+      show(job.state === 'final' || /\/final$/.test(location.hash) ? (job.state === 'final' ? 'fin' : 'sel') : 'sel');
+    }).catch(function () { problem('The page couldn’t reach the server. Check your connection and refresh.'); });
   }
-  function problem(t) { document.getElementById('lead').textContent = ''; var x = el('section', { 'class': 'panel' }); x.appendChild(el('h2', null, 'This page can’t open')); x.appendChild(el('p', { 'class': 'muted' }, esc(t))); app.appendChild(x); }
 
   if (!T) { problem('The link is missing its code. Please open the link exactly as you received it.'); return; }
-  get('a=job&t=' + encodeURIComponent(T)).then(function (j) {
-    if (!j.ok) { problem(j.error || 'This link is not valid.'); return; }
-    job = j.job;
-    document.getElementById('title').textContent = (job.brand || job.client || 'Your designs') + (job.title ? ' · ' + job.title : '');
-    document.title = (job.brand || 'Your designs') + ' · Gulf Social Studio';
-    if (job.state === 'choose' && job.round_sent && job.round_sent.choose) { thanks('Your choices are with me.', 'Sent on ' + job.round_sent.choose + ' (Cairo time). I’ll send you this same link when the designs are ready.'); return; }
-    if (job.state === 'revise' && job.round_sent && job.round_sent.revise) { thanks('Your answers are with me.', 'Sent on ' + job.round_sent.revise + ' (Cairo time). The final files come on this same link.'); return; }
-    if (job.state === 'choose') renderChoose(); else if (job.state === 'revise') renderRevise(); else if (job.state === 'final') renderFinal();
-    else problem('This review is closed.');
-  }).catch(function () { problem('The page couldn’t reach the server. Check your connection and refresh.'); });
+  T = T.replace(/\/final$/, '');
+  load();
   var foot = el('p', { 'class': 'foot' }, 'Gulf Social Studio · <a href="https://ahmedgamaldesign.github.io/" rel="noopener">ahmedgamaldesign.github.io</a> · questions: <a href="mailto:ahmedgamal8438@gmail.com">ahmedgamal8438@gmail.com</a>');
   document.querySelector('main .in').after(foot);
 })();
