@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Your designs · Gulf Social Studio</title>
+<link rel="icon" href="../favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira:wght@300;400;500;600&family=Unbounded:wght@600;800&display=swap">
+<style>
+:root { --bg: #f3f7fa; --card: #ffffff; --ink: #0b1b2e; --muted: #4a5d72; --line: #d6e2ea; --cyan: #1597cc; --cyan-l: #35c8f5;
+  --ok: #1a9b62; --warn: #c2410c; --dark: #04070a; --f-body: 'Saira', system-ui, sans-serif; --f-display: 'Unbounded', 'Saira', sans-serif; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.55 var(--f-body); }
+a { color: var(--cyan); }
+.top { background: var(--dark); color: #eaf5fa; padding: calc(env(safe-area-inset-top, 0px) + 18px) 20px 22px; }
+.top .in, main .in { max-width: 1180px; margin: 0 auto; }
+.brand { font: 800 15px/1 var(--f-display); letter-spacing: .04em; text-transform: uppercase; }
+.brand span { color: var(--cyan-l); }
+.by { font-size: 13px; color: #8ea9b6; margin-top: 6px; }
+h1 { font: 600 clamp(24px, 4.2vw, 40px)/1.15 var(--f-display); margin: 26px 0 8px; }
+.lead { color: #b4cbd9; max-width: 70ch; margin: 0; }
+main { padding: 26px 20px 140px; }
+.post { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; margin: 0 0 22px; }
+.post h2 { font: 600 19px/1.3 var(--f-body); margin: 0 0 14px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.post h2 .num { font: 800 13px/1 var(--f-display); color: var(--cyan); letter-spacing: .06em; }
+.opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .opts { grid-template-columns: 1fr; } }
+.opt { position: relative; border: 2px solid var(--line); border-radius: 14px; padding: 10px; background: #fafcfd; transition: border-color .15s, box-shadow .15s; }
+.frame { cursor: zoom-in; }
+.olab { cursor: pointer; }
+.opt:hover { border-color: #9fc9dc; }
+.opt.on { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(21,151,204,.18); background: #fff; }
+.frame { position: relative; width: 100%; background: #e9eff3; border-radius: 9px; overflow: hidden; }
+.frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
+.frame .wait { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 13px; }
+.full { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 6px; font: 500 13px var(--f-body); color: var(--cyan); background: none; border: 0; padding: 6px 2px; cursor: zoom-in; }
+.full svg { width: 16px; height: 16px; }
+.cap { position: absolute; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); display: flex; justify-content: center; gap: 12px; align-items: center; color: #eaf5fa; font-size: 15px; }
+.olab { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.olab input { width: 20px; height: 20px; accent-color: var(--cyan); margin: 0; flex: none; }
+.olab b { font-weight: 600; }
+.olab small { display: block; color: var(--muted); font-size: 13px; line-height: 1.35; }
+.note { margin-top: 16px; display: grid; gap: 10px; }
+.note label { font-size: 14px; color: var(--muted); }
+textarea { width: 100%; min-height: 74px; resize: vertical; border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; font: inherit; color: var(--ink); background: #fff; }
+textarea:focus { outline: 2px solid rgba(21,151,204,.35); border-color: var(--cyan); }
+.voice { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 600 15px var(--f-body); border-radius: 999px; padding: 10px 18px; border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); cursor: pointer; text-decoration: none; }
+.btn.primary { background: var(--cyan-l); border-color: var(--cyan-l); color: #03121a; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn.small { padding: 7px 14px; font-size: 14px; }
+.rec-dot { width: 10px; height: 10px; border-radius: 50%; background: #e23; display: inline-block; animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: .2; } }
+audio { height: 36px; max-width: 100%; }
+.one { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 760px) { .one { grid-template-columns: 1fr; } }
+.tag { display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; border-radius: 999px; padding: 3px 10px; background: #e3f3fa; color: var(--cyan); }
+.choice { display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0 4px; }
+.choice label { display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid var(--line); border-radius: 999px; padding: 8px 14px; cursor: pointer; background: #fff; }
+.choice input { accent-color: var(--cyan); width: 18px; height: 18px; margin: 0; }
+.choice label:has(input:checked) { border-color: var(--cyan); background: #eef8fc; }
+.dl { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: rgba(255,255,255,.96); backdrop-filter: blur(8px); border-top: 1px solid var(--line);
+  padding: 12px 20px calc(env(safe-area-inset-bottom, 0px) + 12px); }
+.bar .in { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.bar .count { color: var(--muted); font-size: 15px; }
+.bar .count b { color: var(--ink); }
+.msg { margin: 0; font-size: 14px; }
+.msg.err { color: var(--warn); }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 26px; max-width: 760px; }
+.panel h2 { font: 600 24px/1.25 var(--f-display); margin: 0 0 10px; }
+.muted { color: var(--muted); }
+.box { position: fixed; inset: 0; z-index: 50; background: rgba(2,5,8,.94); display: none; place-items: center; padding: calc(env(safe-area-inset-top, 0px) + 50px) 14px calc(env(safe-area-inset-bottom, 0px) + 70px); }
+.box.open { display: grid; }
+.box img { max-width: 100%; max-height: calc(100vh - 140px); object-fit: contain; display: block; }
+.box .x { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 10px); right: 14px; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.4); background: transparent; color: #fff; font-size: 22px; cursor: pointer; }
+.foot { text-align: center; color: var(--muted); font-size: 13px; margin-top: 30px; }
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <div class="brand">Gulf Social <span>Studio</span></div>
+  <div class="by">Ahmed Gamal · Creative Director</div>
+  <h1 id="title">Your designs</h1>
+  <p class="lead" id="lead">Loading…</p>
+</div></header>
+<main><div class="in" id="app"></div></main>
+<div class="bar" id="bar" hidden><div class="in"><div><div class="count" id="count"></div><p class="msg" id="msg" role="status" aria-live="polite"></p></div>
+  <button class="btn primary" id="send" type="button" disabled>Send</button></div></div>
+<div class="box" id="box" role="dialog" aria-modal="true" aria-label="Design at full size"><button class="x" type="button" aria-label="Close">×</button><img alt=""><div class="cap"><span class="cap-t"></span><button class="btn primary small cap-pick" type="button" hidden>Choose this design</button></div></div>
+<script>
+(function () {
+  var API = 'https://script.google.com/macros/s/AKfycbwH4J-rHUD-tbI3oI5hzAtJczLuyDyYq5icd_cOvEiPV7RhNQRy8JYZNEOkxP84b6Cf/exec';
+  var T = (location.hash || '').replace(/^#\/?/, '').trim();
+  var app = document.getElementById('app'), bar = document.getElementById('bar'), sendBtn = document.getElementById('send');
+  var countEl = document.getElementById('count'), msgEl = document.getElementById('msg');
+  var DESC = { 'continue': 'Your brand’s own social look, refined.', proven: 'What works best in your field.', fresh: 'A new look from a neighbouring field.' };
+  var job = null, voices = {}, imgCache = {};
+  var store = (function () { try { var k = 'gss_' + T.slice(0, 12); return { get: function () { return JSON.parse(localStorage.getItem(k) || '{}'); }, set: function (o) { localStorage.setItem(k, JSON.stringify(o)); } }; } catch (e) { return { get: function () { return {}; }, set: function () {} }; } })();
+  function el(tag, attrs, html) { var e = document.createElement(tag); for (var k in (attrs || {})) e.setAttribute(k, attrs[k]); if (html != null) e.innerHTML = html; return e; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function say(t, err) { msgEl.textContent = t || ''; msgEl.classList.toggle('err', !!err); }
+  function ratio(r) { var m = String(r || '4:5').split(':'); var w = Number(m[0]) || 4, h = Number(m[1]) || 5; return (h / w * 100) + '%'; }
+  function get(q) { return fetch(API + '?' + q + '&_=' + Date.now()).then(function (r) { return r.json(); }); }
+  function post(o) { return fetch(API, { method: 'POST', body: JSON.stringify(o) }).then(function (r) { return r.json(); }).then(function (j) { if (!j.ok) throw new Error(j.error || 'Something went wrong.'); return j; }); }
+
+  // ---------- the designs: loaded as they come into view, three at a time ----------
+  var queue = [], running = 0;
+  function pump() {
+    while (running < 3 && queue.length) {
+      var it = queue.shift(); running++;
+      (function (it) {
+        (imgCache[it.f] ? Promise.resolve(imgCache[it.f]) : get('a=img&t=' + encodeURIComponent(T) + '&f=' + encodeURIComponent(it.f)).then(function (j) {
+          if (!j.ok) throw new Error(j.error); imgCache[it.f] = 'data:' + j.mime + ';base64,' + j.data; return imgCache[it.f];
+        })).then(function (src) { it.img.src = src; it.img.hidden = false; if (it.wait) it.wait.remove(); })
+          .catch(function () { if (it.wait) it.wait.textContent = 'Could not load this design. Refresh the page.'; })
+          .then(function () { running--; pump(); });
+      })(it);
+    }
+  }
+  var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); queue.push(e.target._it); pump(); } });
+  }, { rootMargin: '600px 0px' }) : null;
+  function frame(fileId, r, alt) {
+    var f = el('div', { 'class': 'frame' }); f.style.paddingTop = ratio(r);
+    var img = el('img', { alt: alt || 'Design', hidden: '' }); var w = el('div', { 'class': 'wait' }, 'Loading…');
+    f.appendChild(img); f.appendChild(w);
+    f.setAttribute('role', 'button'); f.setAttribute('tabindex', '0'); f.setAttribute('aria-label', 'See ' + (alt || 'the design') + ' full size');
+    var go = function () { if (img.src) openBox(img.src, alt, f._pick); };
+    f.addEventListener('click', go);
+    f.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+    f._it = { f: fileId, img: img, wait: w };
+    if (fileId) { if (io) io.observe(f); else { queue.push(f._it); pump(); } } else w.textContent = 'Not ready yet';
+    return f;
+  }
+  var box = document.getElementById('box');
+  var boxPick = null;
+  function openBox(src, alt, pick) {
+    var i = box.querySelector('img'); i.src = src; i.alt = alt || '';
+    box.querySelector('.cap-t').textContent = alt || '';
+    boxPick = pick || null; box.querySelector('.cap-pick').hidden = !pick;
+    box.classList.add('open'); box.querySelector('.x').focus();
+  }
+  box.addEventListener('click', function (e) {
+    if (e.target.classList.contains('cap-pick') && boxPick) boxPick();
+    box.classList.remove('open');
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') box.classList.remove('open'); });
+
+  // ---------- a voice note per post ----------
+  function voiceUI(key) {
+    var w = el('div', { 'class': 'voice' });
+    var rec = el('button', { 'class': 'btn small', type: 'button' }, '● Record a voice note');
+    var stop = el('button', { 'class': 'btn small', type: 'button', hidden: '' }, '■ Stop');
+    var del = el('button', { 'class': 'btn small', type: 'button', hidden: '' }, 'Delete');
+    var st = el('span', { 'class': 'muted' }), au = el('audio', { controls: '', hidden: '' });
+    w.append(rec, stop, st, au, del);
+    if (!(navigator.mediaDevices && window.MediaRecorder)) { rec.disabled = true; st.textContent = 'Voice notes aren’t available in this browser; please type your note.'; return w; }
+    var r = null, chunks = [];
+    rec.addEventListener('click', function () {
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+        var type = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'].filter(function (t) { return MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t); })[0] || '';
+        r = new MediaRecorder(stream, type ? { mimeType: type } : undefined); chunks = [];
+        r.ondataavailable = function (e) { if (e.data.size) chunks.push(e.data); };
+        r.onstop = function () {
+          stream.getTracks().forEach(function (t) { t.stop(); });
+          var b = new Blob(chunks, { type: r.mimeType || 'audio/webm' }); voices[key] = b;
+          au.src = URL.createObjectURL(b); au.hidden = false; del.hidden = false; rec.hidden = false; stop.hidden = true; st.textContent = '';
+        };
+        r.start(); rec.hidden = true; stop.hidden = false; st.innerHTML = '<span class="rec-dot"></span> Recording…';
+      }, function () { st.textContent = 'The microphone wasn’t allowed. You can type your note instead.'; });
+    });
+    stop.addEventListener('click', function () { if (r && r.state !== 'inactive') r.stop(); });
+    del.addEventListener('click', function () { delete voices[key]; au.hidden = true; au.removeAttribute('src'); del.hidden = true; });
+    return w;
+  }
+  function b64(blob) { return new Promise(function (res, rej) { var fr = new FileReader(); fr.onload = function () { res(String(fr.result).split(',')[1] || ''); }; fr.onerror = rej; fr.readAsDataURL(blob); }); }
+  function sendVoices(round) {
+    var keys = Object.keys(voices), chain = Promise.resolve();
+    keys.forEach(function (k, i) {
+      chain = chain.then(function () { say('Sending voice note ' + (i + 1) + ' of ' + keys.length + '…'); return b64(voices[k]); })
+        .then(function (d) { return post({ action: 'voice', t: T, n: Number(k), round: round, mime: voices[k].type, data: d }); });
+    });
+    return chain;
+  }
+
+  // ---------- the three states ----------
+  function renderChoose() {
+    var saved = store.get();
+    document.getElementById('lead').textContent = 'Each post comes in three directions. Choose one for every post; tap a design to see it full size. If you want something changed, add a note or record a voice note under that post (one revision per design is included).';
+    job.posts.forEach(function (p) {
+      var s = el('section', { 'class': 'post', id: 'post-' + p.n });
+      s.appendChild(el('h2', null, '<span class="num">POST ' + p.n + '</span>' + esc(p.name)));
+      var g = el('div', { 'class': 'opts', role: 'radiogroup', 'aria-label': 'Post ' + p.n });
+      (p.options || []).forEach(function (o) {
+        var c = el('div', { 'class': 'opt' });
+        var fr = frame(o.file, p.ratio, 'Post ' + p.n + ' · ' + o.label);
+        c.appendChild(fr);
+        var lab = el('label', { 'class': 'olab' }, '<input type="radio" name="pick-' + p.n + '" value="' + o.key + '"><div><b>' + esc(o.label) + '</b><small>' + esc(DESC[o.key] || '') + '</small></div>');
+        c.appendChild(lab); g.appendChild(c);
+        var inp = lab.querySelector('input');
+        fr._pick = function () { inp.checked = true; inp.dispatchEvent(new Event('change')); };
+        if ((saved['pick-' + p.n] || p.pick) === o.key) { inp.checked = true; c.classList.add('on'); }
+        inp.addEventListener('change', function () {
+          g.querySelectorAll('.opt').forEach(function (x) { x.classList.toggle('on', x.querySelector('input').checked); });
+          var sv = store.get(); sv['pick-' + p.n] = o.key; store.set(sv); update();
+        });
+      });
+      s.appendChild(g);
+      var n = el('div', { 'class': 'note' });
+      n.appendChild(el('label', { 'for': 'c-' + p.n }, 'A note on this post (optional)'));
+      var ta = el('textarea', { id: 'c-' + p.n, placeholder: 'For example: the same design, but with a man instead of a woman.' });
+      ta.value = saved['c-' + p.n] || p.comment || '';
+      ta.addEventListener('input', function () { var sv = store.get(); sv['c-' + p.n] = ta.value; store.set(sv); });
+      n.appendChild(ta); n.appendChild(voiceUI(String(p.n))); s.appendChild(n);
+      app.appendChild(s);
+    });
+    sendBtn.textContent = 'Send my choices';
+    bar.hidden = false;
+    function update() {
+      var done = job.posts.filter(function (p) { return document.querySelector('input[name="pick-' + p.n + '"]:checked'); }).length;
+      countEl.innerHTML = 'Chosen <b>' + done + ' of ' + job.posts.length + '</b>';
+      sendBtn.disabled = done < job.posts.length;
+    }
+    update();
+    sendBtn.onclick = function () {
+      var picks = job.posts.map(function (p) { var c = document.querySelector('input[name="pick-' + p.n + '"]:checked'); return { n: p.n, pick: c && c.value, comment: document.getElementById('c-' + p.n).value }; });
+      sendBtn.disabled = true;
+      sendVoices(1).then(function () { say('Sending your choices…'); return post({ action: 'choose', t: T, picks: picks }); })
+        .then(function () { store.set({}); thanks('Thank you. Your choices are with me.', 'I’ll prepare the final designs and the revisions you asked for, and send you this same link when they’re ready.'); })
+        .catch(function (e) { sendBtn.disabled = false; say((e && e.message ? e.message + ' ' : '') + 'If it keeps failing, write to me on WhatsApp or at ahmedgamal8438@gmail.com.', true); });
+    };
+  }
+
+  function renderRevise() {
+    var saved = store.get();
+    document.getElementById('lead').textContent = 'Here are your designs after the revisions. Approve each one, or ask for a change with a note or a voice note.';
+    job.posts.forEach(function (p) {
+      var s = el('section', { 'class': 'post' });
+      s.appendChild(el('h2', null, '<span class="num">POST ' + p.n + '</span>' + esc(p.name) + (p.revised ? ' <span class="tag">Revised</span>' : '')));
+      var one = el('div', { 'class': 'one' });
+      one.appendChild(frame(p.file, p.ratio, 'Post ' + p.n));
+      var r = el('div');
+      r.appendChild(el('div', { 'class': 'muted' }, 'Direction: ' + esc(p.label)));
+      var ch = el('div', { 'class': 'choice', role: 'radiogroup' }, '<label><input type="radio" name="ok-' + p.n + '" value="1"> Approve</label><label><input type="radio" name="ok-' + p.n + '" value="0"> Ask for a change</label>');
+      r.appendChild(ch);
+      var v = saved['ok-' + p.n]; if (v != null) { var x = ch.querySelector('input[value="' + v + '"]'); if (x) x.checked = true; }
+      var n = el('div', { 'class': 'note' });
+      var ta = el('textarea', { id: 'c2-' + p.n, placeholder: 'What should change?' }); ta.value = saved['c2-' + p.n] || p.comment2 || '';
+      ta.addEventListener('input', function () { var sv = store.get(); sv['c2-' + p.n] = ta.value; store.set(sv); });
+      n.append(el('label', { 'for': 'c2-' + p.n }, 'A note (optional)'), ta, voiceUI(String(p.n)));
+      r.appendChild(n); one.appendChild(r); s.appendChild(one); app.appendChild(s);
+      ch.querySelectorAll('input').forEach(function (i) { i.addEventListener('change', function () { var sv = store.get(); sv['ok-' + p.n] = i.value; store.set(sv); update(); }); });
+    });
+    sendBtn.textContent = 'Send';
+    bar.hidden = false;
+    function update() {
+      var done = job.posts.filter(function (p) { return document.querySelector('input[name="ok-' + p.n + '"]:checked'); }).length;
+      countEl.innerHTML = 'Answered <b>' + done + ' of ' + job.posts.length + '</b>';
+      sendBtn.disabled = done < job.posts.length;
+    }
+    update();
+    sendBtn.onclick = function () {
+      var items = job.posts.map(function (p) { var c = document.querySelector('input[name="ok-' + p.n + '"]:checked'); return { n: p.n, ok: c ? c.value === '1' : null, comment: document.getElementById('c2-' + p.n).value }; });
+      sendBtn.disabled = true;
+      sendVoices(2).then(function () { say('Sending…'); return post({ action: 'approve', t: T, items: items }); })
+        .then(function () { store.set({}); thanks('Thank you. Your answers are with me.', 'Approved designs go into the final files; anything you asked to change comes back to you on this same link.'); })
+        .catch(function (e) { sendBtn.disabled = false; say((e && e.message ? e.message + ' ' : '') + 'If it keeps failing, write to me on WhatsApp or at ahmedgamal8438@gmail.com.', true); });
+    };
+  }
+
+  function renderFinal() {
+    document.getElementById('lead').textContent = 'Your final designs: a high-quality file for each post, ready to publish, and a simple layered PSD so you can edit the text or swap the logo yourself.';
+    if (job.zip) { var z = el('div', { 'class': 'dl' }); z.appendChild(el('a', { 'class': 'btn primary', href: job.zip, rel: 'noopener' }, 'Download all designs (ZIP)')); var w = el('section', { 'class': 'post' }); w.appendChild(z); app.appendChild(w); }
+    job.posts.forEach(function (p) {
+      var s = el('section', { 'class': 'post' });
+      s.appendChild(el('h2', null, '<span class="num">POST ' + p.n + '</span>' + esc(p.name)));
+      var one = el('div', { 'class': 'one' }); one.appendChild(frame(p.file, p.ratio, 'Post ' + p.n));
+      var d = el('div', { 'class': 'dl' });
+      if (p.png) d.appendChild(el('a', { 'class': 'btn primary', href: p.png, rel: 'noopener' }, 'High-quality file'));
+      if (p.psd) d.appendChild(el('a', { 'class': 'btn', href: p.psd, rel: 'noopener' }, 'Layered PSD'));
+      if (!p.png && !p.psd) d.appendChild(el('span', { 'class': 'muted' }, 'The files for this post are on their way.'));
+      one.appendChild(d); s.appendChild(one); app.appendChild(s);
+    });
+  }
+
+  function thanks(h, p) {
+    bar.hidden = true; app.innerHTML = '';
+    var x = el('section', { 'class': 'panel' }); x.appendChild(el('h2', null, esc(h))); x.appendChild(el('p', { 'class': 'muted' }, esc(p)));
+    app.appendChild(x); window.scrollTo(0, 0);
+  }
+  function problem(t) { document.getElementById('lead').textContent = ''; var x = el('section', { 'class': 'panel' }); x.appendChild(el('h2', null, 'This page can’t open')); x.appendChild(el('p', { 'class': 'muted' }, esc(t))); app.appendChild(x); }
+
+  if (!T) { problem('The link is missing its code. Please open the link exactly as you received it.'); return; }
+  get('a=job&t=' + encodeURIComponent(T)).then(function (j) {
+    if (!j.ok) { problem(j.error || 'This link is not valid.'); return; }
+    job = j.job;
+    document.getElementById('title').textContent = (job.brand || job.client || 'Your designs') + (job.title ? ' · ' + job.title : '');
+    document.title = (job.brand || 'Your designs') + ' · Gulf Social Studio';
+    if (job.state === 'choose' && job.round_sent && job.round_sent.choose) { thanks('Your choices are with me.', 'Sent on ' + job.round_sent.choose + ' (Cairo time). I’ll send you this same link when the designs are ready.'); return; }
+    if (job.state === 'revise' && job.round_sent && job.round_sent.revise) { thanks('Your answers are with me.', 'Sent on ' + job.round_sent.revise + ' (Cairo time). The final files come on this same link.'); return; }
+    if (job.state === 'choose') renderChoose(); else if (job.state === 'revise') renderRevise(); else if (job.state === 'final') renderFinal();
+    else problem('This review is closed.');
+  }).catch(function () { problem('The page couldn’t reach the server. Check your connection and refresh.'); });
+  var foot = el('p', { 'class': 'foot' }, 'Gulf Social Studio · <a href="https://ahmedgamaldesign.github.io/" rel="noopener">ahmedgamaldesign.github.io</a> · questions: <a href="mailto:ahmedgamal8438@gmail.com">ahmedgamal8438@gmail.com</a>');
+  document.querySelector('main .in').after(foot);
+})();
+</script>
+</body>
+</html>
