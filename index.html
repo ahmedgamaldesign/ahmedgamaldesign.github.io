@@ -1090,6 +1090,9 @@ html.intro .view[data-view="home"] .contents .h-sec { animation: in-u .8s cubic-
 @media (max-width: 760px) {
   .svc-cards, .svc-intro, .rq-row, .rq-row.r3, .rq .tpl { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* v9: only the campaign types of the chosen service show (24 Nov 22:00) */
+.rq .checks[hidden] { display: none; }
 </style>
 </head>
 <body>
@@ -1743,12 +1746,27 @@ html.intro .view[data-view="home"] .contents .h-sec { animation: in-u .8s cubic-
     </fieldset>
     <fieldset><legend>The campaign</legend>
       <div class="f"><span class="hint">Campaign type (tick all that apply)</span>
-        <div class="checks">
+        <div class="checks" data-for="Medical">
           <label><input type="checkbox" name="campaign" value="Awareness"> Awareness</label>
           <label><input type="checkbox" name="campaign" value="Product launch"> Product launch</label>
           <label><input type="checkbox" name="campaign" value="Offer"> Offer</label>
           <label><input type="checkbox" name="campaign" value="Event or webinar"> Event or webinar</label>
           <label><input type="checkbox" name="campaign" value="Occasion"> Occasion</label>
+          <label><input type="checkbox" name="campaign" value="Other" data-other> Other</label>
+        </div>
+        <div class="checks" data-for="Non-medical" hidden>
+          <label><input type="checkbox" name="campaign" value="Brand awareness"> Brand awareness</label>
+          <label><input type="checkbox" name="campaign" value="Product launch"> Product launch</label>
+          <label><input type="checkbox" name="campaign" value="Offer or sale"> Offer or sale</label>
+          <label><input type="checkbox" name="campaign" value="Occasion (Ramadan, Eid, National Day)"> Occasion (Ramadan, Eid, National Day)</label>
+          <label><input type="checkbox" name="campaign" value="New collection or menu"> New collection or menu</label>
+          <label><input type="checkbox" name="campaign" value="Event or opening"> Event or opening</label>
+          <label><input type="checkbox" name="campaign" value="Contest or giveaway"> Contest or giveaway</label>
+          <label><input type="checkbox" name="campaign" value="Engagement (polls, questions)"> Engagement (polls, questions)</label>
+          <label><input type="checkbox" name="campaign" value="Tips and how-to"> Tips and how-to</label>
+          <label><input type="checkbox" name="campaign" value="Brand story or behind the scenes"> Brand story or behind the scenes</label>
+          <label><input type="checkbox" name="campaign" value="Customer reviews"> Customer reviews</label>
+          <label><input type="checkbox" name="campaign" value="Hiring"> Hiring</label>
           <label><input type="checkbox" name="campaign" value="Other" data-other> Other</label>
         </div>
         <input type="text" name="campaign_other" placeholder="Which other type?" hidden>
@@ -2118,6 +2136,8 @@ html.intro .view[data-view="home"] .contents .h-sec { animation: in-u .8s cubic-
   var done = document.getElementById('rq-done'), msg = form.querySelector('.rq-msg'), bar = form.querySelector('.rq-progress'), barI = bar.querySelector('i');
   var sendBtn = form.querySelector('button[type=submit]');
 
+  function values(name) { return Array.prototype.map.call(form.querySelectorAll('[name=' + name + ']:checked:not(:disabled)'), function (i) { return i.value; }); }
+
   // the service from the address: #/request/medical or #/request/general
   function preselect() {
     var h = (location.hash || '').split('/');
@@ -2125,10 +2145,20 @@ html.intro .view[data-view="home"] .contents .h-sec { animation: in-u .8s cubic-
     var v = h[2] === 'medical' ? 'Medical' : h[2] === 'general' ? 'Non-medical' : '';
     if (v) form.querySelectorAll('input[name=service]').forEach(function (r) { r.checked = r.value === v; });
   }
-  preselect(); window.addEventListener('hashchange', preselect);
+  preselect(); window.addEventListener('hashchange', function () { preselect(); syncGroups(); });
 
-  var other = form.querySelector('[data-other]'), otherText = form.querySelector('[name=campaign_other]');
-  other.addEventListener('change', function () { otherText.hidden = !other.checked; if (other.checked) otherText.focus(); });
+  // the campaign types: one list for each service; only the chosen service's list shows and is sent (his note, 24 Nov 21:59)
+  var otherText = form.querySelector('[name=campaign_other]'), groups = form.querySelectorAll('.checks[data-for]');
+  function shownOther() { var g = form.querySelector('.checks[data-for]:not([hidden])'); return g ? g.querySelector('[data-other]') : null; }
+  function syncOther() { var o = shownOther(); otherText.hidden = !(o && o.checked); }
+  function syncGroups() {
+    var v = values('service')[0] || 'Non-medical';
+    groups.forEach(function (g) { var on = g.getAttribute('data-for') === v; g.hidden = !on; g.querySelectorAll('input').forEach(function (i) { i.disabled = !on; }); });
+    syncOther();
+  }
+  form.querySelectorAll('[data-other]').forEach(function (o) { o.addEventListener('change', function () { syncOther(); if (o.checked) otherText.focus(); }); });
+  form.querySelectorAll('input[name=service]').forEach(function (r) { r.addEventListener('change', syncGroups); });
+  syncGroups();
 
   // file lists, and drag and drop onto each box
   form.querySelectorAll('[data-drop]').forEach(function (box) {
@@ -2185,7 +2215,7 @@ html.intro .view[data-view="home"] .contents .h-sec { animation: in-u .8s cubic-
     function upd() { var o = sel.selectedOptions[0]; if (o) show.textContent = o.textContent.split(' ')[0] + ' ' + o.getAttribute('data-code'); }
     sel.addEventListener('change', upd); upd();
   })();
-  function values(name) { return Array.prototype.map.call(form.querySelectorAll('[name=' + name + ']:checked'), function (i) { return i.value; }); }
+
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -2203,7 +2233,7 @@ html.intro .view[data-view="home"] .contents .h-sec { animation: in-u .8s cubic-
     var data = {
       action: 'start', website_url_hp: f.website_url_hp.value, service: (values('service')[0] || ''), name: f.name.value, email: f.email.value,
       whatsapp: ((f.whatsapp_cc && f.whatsapp_cc.selectedOptions[0]) ? f.whatsapp_cc.selectedOptions[0].getAttribute('data-code') + ' ' : '') + f.whatsapp.value.trim(), brand: f.brand.value, product: f.product.value, instagram: f.instagram.value, website: f.website.value,
-      campaign: values('campaign'), campaign_other: other.checked ? otherText.value : '', posts: f.posts.value, sizes: values('sizes'),
+      campaign: values('campaign'), campaign_other: (shownOther() && shownOther().checked) ? otherText.value : '', posts: f.posts.value, sizes: values('sizes'),
       deadline: f.deadline.value, language: f.language.value
     };
     var steps = files.length + 2, step = 0;
