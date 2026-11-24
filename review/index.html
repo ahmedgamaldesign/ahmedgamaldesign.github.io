@@ -80,12 +80,14 @@ audio { height: 36px; max-width: 100%; }
 .box img { max-width: 100%; max-height: calc(100vh - 140px); object-fit: contain; display: block; }
 .box .x { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 10px); right: 14px; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.4); background: transparent; color: #fff; font-size: 22px; cursor: pointer; }
 .foot { text-align: center; color: var(--muted); font-size: 13px; margin-top: 30px; }
-.tabs { position: sticky; top: 0; z-index: 15; background: rgba(243,247,250,.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); padding: 0 20px; }
-.tabs .in { max-width: 1180px; margin: 0 auto; display: flex; gap: 6px; }
-.tab { font: 600 15px var(--f-body); color: var(--muted); background: none; border: 0; border-bottom: 3px solid transparent; padding: 15px 14px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
-.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--cyan); }
-.tab .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
-.tab:disabled { cursor: default; }
+.tabs { position: sticky; top: 0; z-index: 15; background: rgba(243,247,250,.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); padding: 12px 20px; }
+.tabs .in { max-width: 1180px; margin: 0 auto; display: flex; gap: 10px; flex-wrap: wrap; }
+.tab { font: 600 15px/1 var(--f-body); color: var(--cyan); background: #fff; border: 1.5px solid var(--cyan); border-radius: 999px; padding: 11px 20px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: background .15s, color .15s, border-color .15s; }
+.tab:hover { background: #e8f6fc; }
+.tab[aria-selected="true"] { background: var(--cyan); border-color: var(--cyan); color: #fff; box-shadow: 0 4px 14px rgba(21,151,204,.28); }
+.tab:focus-visible { outline: 3px solid var(--cyan-l); outline-offset: 2px; }
+.tab.locked, .tab.locked:hover { background: #e4e9ee; border-color: #e4e9ee; color: #7d8c9b; cursor: not-allowed; box-shadow: none; }
+.tab .lock { width: 14px; height: 14px; flex: none; }
 .note-ro { margin-top: 10px; font-size: 14px; color: var(--muted); }
 .note-ro b { color: var(--ink); font-weight: 600; }
 .files { display: grid; gap: 10px; align-content: start; }
@@ -343,7 +345,7 @@ audio { height: 36px; max-width: 100%; }
     if (job.files_folder || job.zip) {
       var w = el('section', { 'class': 'post' }), all = el('div', { 'class': 'all' });
       all.appendChild(el('a', { 'class': 'btn primary', href: job.files_folder || job.zip, target: '_blank', rel: 'noopener' }, 'Download all' + (job.files_folder ? ' (Google Drive folder)' : ' (ZIP)')));
-      all.appendChild(el('p', null, job.files_folder ? 'Every file in one folder. In Google Drive, press Download (top right) to get the whole folder at once.' : 'All the high-quality files in one ZIP.'));
+      all.appendChild(el('p', null, job.files_folder ? 'One folder, with a folder for each post that holds its high-quality JPG and its layered PSD. In Google Drive, press Download (top right) to get everything at once.' : 'All the high-quality files in one ZIP.'));
       w.appendChild(all); pFin.appendChild(w);
     }
     job.posts.forEach(function (p) {
@@ -380,7 +382,11 @@ audio { height: 36px; max-width: 100%; }
         renderRecord(msgH, msgP);
       }
       renderFinal();
-      tFin.innerHTML = 'Final files' + (job.state === 'final' ? ' <span class="dot" aria-hidden="true"></span>' : '');
+      var ready = job.state === 'final';
+      tFin.innerHTML = ready ? 'Final files' : '<svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>Final files';
+      tFin.disabled = !ready; tFin.classList.toggle('locked', !ready);
+      tFin.title = ready ? '' : 'Opens when your designs are approved';
+      tFin.setAttribute('aria-label', ready ? 'Final files' : 'Final files, locked until your designs are approved');
       show(job.state === 'final' || /\/final$/.test(location.hash) ? (job.state === 'final' ? 'fin' : 'sel') : 'sel');
     }).catch(function () { problem('The page couldn’t reach the server. Check your connection and refresh.'); });
   }
