@@ -276,7 +276,13 @@ audio { height: 36px; max-width: 100%; }
 
   function renderFinal() {
     document.getElementById('lead').textContent = 'Your final designs: a high-quality file for each post, ready to publish, and a simple layered PSD so you can edit the text or swap the logo yourself.';
-    if (job.zip) { var z = el('div', { 'class': 'dl' }); z.appendChild(el('a', { 'class': 'btn primary', href: job.zip, rel: 'noopener' }, 'Download all designs (ZIP)')); var w = el('section', { 'class': 'post' }); w.appendChild(z); app.appendChild(w); }
+    if (job.files_folder) {
+      var w = el('section', { 'class': 'post' });
+      w.appendChild(el('h2', null, 'All your files, in one folder'));
+      w.appendChild(el('p', { 'class': 'muted' }, 'For every post: the high-quality file (PNG) and the layered PSD, with the list of fonts the PSDs use. In Google Drive you can download a single file, or the whole folder at once (Download, top right).'));
+      var z = el('div', { 'class': 'dl' }); z.appendChild(el('a', { 'class': 'btn primary', href: job.files_folder, target: '_blank', rel: 'noopener' }, 'Open your files (Google Drive)'));
+      w.appendChild(z); app.appendChild(w);
+    } else if (job.zip) { var z2 = el('div', { 'class': 'dl' }); z2.appendChild(el('a', { 'class': 'btn primary', href: job.zip, rel: 'noopener' }, 'Download all designs (ZIP)')); var w2 = el('section', { 'class': 'post' }); w2.appendChild(z2); app.appendChild(w2); }
     job.posts.forEach(function (p) {
       var s = el('section', { 'class': 'post' });
       s.appendChild(el('h2', null, '<span class="num">POST ' + p.n + '</span>' + esc(p.name)));
@@ -284,7 +290,7 @@ audio { height: 36px; max-width: 100%; }
       var d = el('div', { 'class': 'dl' });
       if (p.png) d.appendChild(el('a', { 'class': 'btn primary', href: p.png, rel: 'noopener' }, 'High-quality file'));
       if (p.psd) d.appendChild(el('a', { 'class': 'btn', href: p.psd, rel: 'noopener' }, 'Layered PSD'));
-      if (!p.png && !p.psd) d.appendChild(el('span', { 'class': 'muted' }, 'The files for this post are on their way.'));
+      if (!p.png && !p.psd) d.appendChild(el('span', { 'class': 'muted' }, job.files_folder ? 'Its PNG and PSD are in your folder (above).' : 'The files for this post are on their way.'));
       one.appendChild(d); s.appendChild(one); app.appendChild(s);
     });
   }
